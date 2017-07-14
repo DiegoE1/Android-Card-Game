@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Deck Of Cards</string>
+    <string name="user_won">You Win!</string>
+    <string name="computer_won">You Lost</string>
 </resources>
