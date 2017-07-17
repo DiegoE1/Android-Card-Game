@@ -27,6 +27,27 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 
+/*
+
+    todo: (1) Finish Logic for the card game
+     - User win vs lose
+    todo: (2) Add an Indeterminate Progress Bar
+     -Show when the async task starts
+     -Hide when the async task finishes
+     -It should be in the center of the screen
+    todo: (3) Add tracking for the Number of games played
+     -Show how many games in total have been played
+     -Show how many games the user won
+     -Show the users Win percentage
+    todo: (4) Create a repo for the chuck norris jokes app
+     -Push your code to that repo
+     -Will probably need to research the steps
+
+ */
+
+// Card Values: 2, 3, 4, 5, 6, 7, 8, 9, 10, Jack or Knave (J), Queen (Q), King (K), Ace (A)
+
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String shuffleCardsEndPoint = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
@@ -35,13 +56,36 @@ public class MainActivity extends AppCompatActivity {
 
     private Button drawCards;
 
+    private TextView playerUser;
+    private TextView playerComp;
+
     private TextView cardNameOne;
     private TextView cardNameTwo;
+
+    private TextView cardValueOne;
+    private TextView cardValueTwo;
+
+    private TextView cardGameWhoWon;
+    private TextView cardGameWinner;
 
     private ImageView cardPicOne;
     private ImageView cardPicTwo;
 
     private String deckId;
+    private String cardStringValueTag;
+    private String gameStringWhoWon;
+    private String gameStringWinner;
+
+    private String gameStringValueOne;
+    private String gameStringValueTwo;
+
+    private String gameStringOutput;
+    private String gameStringWin;
+    private String gameStringLose;
+    private String gameStringTie;
+
+    private int valueOne;
+    private int valueTwo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,20 +94,45 @@ public class MainActivity extends AppCompatActivity {
 
         drawCards = (Button) findViewById(R.id.button_draw_two_cards);
 
+        playerUser = (TextView) findViewById(R.id.tv_player_user);
+        playerComp = (TextView) findViewById(R.id.tv_player_computer);
+
         cardNameOne = (TextView) findViewById(R.id.tv_card_one);
         cardNameTwo = (TextView) findViewById(R.id.tv_card_two);
 
+        cardValueOne = (TextView) findViewById(R.id.tv_user_value);
+        cardValueTwo = (TextView) findViewById(R.id.tv_computer_value);
+
+        cardGameWhoWon = (TextView) findViewById(R.id.tv_game_who_won);
+        cardGameWinner = (TextView) findViewById(R.id.tv_game_winner);
+
         cardPicOne = (ImageView) findViewById(R.id.image_card_one);
         cardPicTwo = (ImageView) findViewById(R.id.image_card_two);
+
+        cardStringValueTag = getString(R.string.card_value_tag);
+        gameStringWhoWon = getString(R.string.game_who_won);
+        gameStringWinner = getString(R.string.game_winner);
+
+        gameStringWin = getString(R.string.game_user_won);
+        gameStringLose = getString(R.string.game_computer_won);
+        gameStringTie = getString(R.string.game_tie);
 
         new ShuffleCardsTask().execute();
 
         drawCards.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new DrawTwoCardsTask().execute();
+                ///*
+                playerUser.setVisibility(View.VISIBLE);
+                playerComp.setVisibility(View.VISIBLE);
                 cardNameOne.setVisibility(View.VISIBLE);
                 cardNameTwo.setVisibility(View.VISIBLE);
-                new DrawTwoCardsTask().execute();
+                cardValueOne.setVisibility(View.VISIBLE);
+                cardValueTwo.setVisibility(View.VISIBLE);
+                cardGameWhoWon.setVisibility(View.VISIBLE);
+                cardGameWinner.setVisibility(View.VISIBLE);
+                //*/
             }
         });
     }
@@ -126,15 +195,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 wholeJson = new JSONObject(cardReturn);
 
-                //TODO: return an array of Card
-
-                //TODO: use the image url inside the card to load the image into an image view via glide
-
                 arrayOfCards = wholeJson.getJSONArray("cards");
 
                 for(int i = 0; i < arrayOfCards.length(); i++){
-                    //todo: use the card object to store the values coming back from each card in the array of cards
-
                     JSONObject object = arrayOfCards.getJSONObject(i);
                     Card cardInArray = new Card();
 
@@ -151,8 +214,6 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("card one", String.valueOf(cards.get(0)));
                 Log.d("card two", String.valueOf(cards.get(1)));
-
-                //TODO: remove strings since we are using the card object
 
             } catch (JSONException e1) {
                 e1.printStackTrace();
@@ -171,15 +232,31 @@ public class MainActivity extends AppCompatActivity {
                     if(i == 0) {
                         cardNameOne.setText(cardArray.get(i).getValue() + " of " + cardArray.get(i).getSuit());
                         Glide.with(MainActivity.this).load(cardArray.get(i).getImage()).into(cardPicOne);
+                        cardValueOne.setText(cardStringValueTag + " " + cardArray.get(i).getValue());
+                        gameStringValueOne = cardArray.get(i).getValue();
                     }
                     if(i == 1) {
                         cardNameTwo.setText(cardArray.get(i).getValue() + " of " + cardArray.get(i).getSuit());
                         Glide.with(MainActivity.this).load(cardArray.get(i).getImage()).into(cardPicTwo);
+                        cardValueTwo.setText(cardStringValueTag + " " + cardArray.get(i).getValue());
+                        gameStringValueTwo = cardArray.get(i).getValue();
                     }
 
                 }
+                cardGameWhoWon.setText(gameStringWhoWon);
+                cardGameWinner.setText(gameStringWinner);
 
+                ValueCompare cardValueCompare = new ValueCompare(gameStringValueOne, gameStringValueTwo);
+                valueOne = cardValueCompare.getFirstStringValue(gameStringValueOne);
+                valueTwo = cardValueCompare.getSecondStringValue(gameStringValueTwo);
 
+                if(valueOne == valueTwo){
+                    cardGameWinner.setText(gameStringWinner + " " + gameStringTie);
+                }else if (valueOne > valueTwo){
+                    cardGameWinner.setText(gameStringWinner + " " + gameStringWin);
+                }else if (valueOne < valueTwo){
+                    cardGameWinner.setText(gameStringWinner + " " + gameStringLose);
+                }
 
             }
         }

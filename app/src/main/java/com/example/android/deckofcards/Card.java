@@ -9,8 +9,7 @@ public class Card {
     String value;
     String suit;
     String code;
-    String cardResponse;
-    
+
     public Card(String mImage, String mValue, String mSuit, String mCode){
         image = mImage;
         value = mValue;

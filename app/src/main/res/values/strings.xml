@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">Deck Of Cards</string>
-    <string name="user_won">You Win!</string>
-    <string name="computer_won">You Lost</string>
+
+    <string name="game_user_won">You Win!</string>
+    <string name="game_computer_won">You Lost</string>
+    <string name="game_tie">Tie!</string>
+
+    <string name="user_name">You</string>
+    <string name="computer_name">Computer</string>
+    <string name="card_value_tag">Value:</string>
+    <string name="game_who_won">Who Won?</string>
+    <string name="game_winner">Winner:</string>
 </resources>
