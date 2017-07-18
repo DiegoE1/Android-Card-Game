@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,9 +46,6 @@ import okhttp3.Response;
 
  */
 
-// Card Values: 2, 3, 4, 5, 6, 7, 8, 9, 10, Jack or Knave (J), Queen (Q), King (K), Ace (A)
-
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String shuffleCardsEndPoint = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
@@ -55,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private String updatedDrawCardsEndPoint;
 
     private Button drawCards;
+
+    private TextView cardsRemaining;
 
     private TextView playerUser;
     private TextView playerComp;
@@ -68,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView cardGameWhoWon;
     private TextView cardGameWinner;
 
+    private TextView totalGames;
+    private TextView totalGamesWon;
+    private TextView totalWinPercent;
+
     private ImageView cardPicOne;
     private ImageView cardPicTwo;
 
@@ -79,13 +83,25 @@ public class MainActivity extends AppCompatActivity {
     private String gameStringValueOne;
     private String gameStringValueTwo;
 
-    private String gameStringOutput;
     private String gameStringWin;
     private String gameStringLose;
     private String gameStringTie;
 
+    private String gameStringTotalGames;
+    private String gameStringTotalWins;
+    private String gameStringTotalPercent;
+
+    private String cardStringRemaining;
+    private String cardStringEndRemaining;
+
+    private ProgressBar indeterminateProgressBar;
+
     private int valueOne;
     private int valueTwo;
+
+    private int totalGamesInt;
+    private int totalGamesWonInt;
+    private double totalWinPercentageDouble;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         drawCards = (Button) findViewById(R.id.button_draw_two_cards);
+
+        cardsRemaining = (TextView) findViewById(R.id.tv_cards_remaining);
 
         playerUser = (TextView) findViewById(R.id.tv_player_user);
         playerComp = (TextView) findViewById(R.id.tv_player_computer);
@@ -106,6 +124,10 @@ public class MainActivity extends AppCompatActivity {
         cardGameWhoWon = (TextView) findViewById(R.id.tv_game_who_won);
         cardGameWinner = (TextView) findViewById(R.id.tv_game_winner);
 
+        totalGames = (TextView) findViewById(R.id.tv_total_games);
+        totalGamesWon = (TextView) findViewById(R.id.tv_total_games_won);
+        totalWinPercent = (TextView) findViewById(R.id.tv_total_win_percentage);
+
         cardPicOne = (ImageView) findViewById(R.id.image_card_one);
         cardPicTwo = (ImageView) findViewById(R.id.image_card_two);
 
@@ -117,6 +139,14 @@ public class MainActivity extends AppCompatActivity {
         gameStringLose = getString(R.string.game_computer_won);
         gameStringTie = getString(R.string.game_tie);
 
+        gameStringTotalGames = getString(R.string.total_games);
+        gameStringTotalWins = getString(R.string.total_games_won);
+        gameStringTotalPercent = getString(R.string.win_percent);
+
+        cardStringEndRemaining = getString(R.string.cards_remaining);
+
+        indeterminateProgressBar = (ProgressBar) findViewById(R.id.indeterminateBar);
+
         new ShuffleCardsTask().execute();
 
         drawCards.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 new DrawTwoCardsTask().execute();
                 ///*
+                cardsRemaining.setVisibility(View.VISIBLE);
                 playerUser.setVisibility(View.VISIBLE);
                 playerComp.setVisibility(View.VISIBLE);
                 cardNameOne.setVisibility(View.VISIBLE);
@@ -132,6 +163,9 @@ public class MainActivity extends AppCompatActivity {
                 cardValueTwo.setVisibility(View.VISIBLE);
                 cardGameWhoWon.setVisibility(View.VISIBLE);
                 cardGameWinner.setVisibility(View.VISIBLE);
+                totalGames.setVisibility(View.VISIBLE);
+                totalGamesWon.setVisibility(View.VISIBLE);
+                totalWinPercent.setVisibility(View.VISIBLE);
                 //*/
             }
         });
@@ -175,6 +209,11 @@ public class MainActivity extends AppCompatActivity {
 
     public class DrawTwoCardsTask extends AsyncTask<Void, Void, ArrayList <Card>> {
         @Override
+        protected void onPreExecute() {
+            indeterminateProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected ArrayList <Card> doInBackground(Void... params) {
             OkHttpClient clientSecond = new OkHttpClient();
             Log.d("secondRequest", updatedDrawCardsEndPoint);
@@ -212,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("card list array", String.valueOf(cards.get(i)));
                 }
 
+                cardStringRemaining = String.valueOf((wholeJson.getString("remaining")));
+
                 Log.d("card one", String.valueOf(cards.get(0)));
                 Log.d("card two", String.valueOf(cards.get(1)));
 
@@ -224,9 +265,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<Card> cardArray) {
             if(cardArray != null){
+                indeterminateProgressBar.setVisibility(View.INVISIBLE);
                 Log.d("post execute", String.valueOf(cardArray));
                 cardPicOne.setVisibility(View.VISIBLE);
                 cardPicTwo.setVisibility(View.VISIBLE);
+                cardsRemaining.setText(cardStringRemaining + " " + cardStringEndRemaining);
+                cardsRemaining.setVisibility(View.VISIBLE);
 
                 for(int i = 0; i < cardArray.size(); i++) {
                     if(i == 0) {
@@ -252,10 +296,26 @@ public class MainActivity extends AppCompatActivity {
 
                 if(valueOne == valueTwo){
                     cardGameWinner.setText(gameStringWinner + " " + gameStringTie);
+                    totalGamesInt++;
                 }else if (valueOne > valueTwo){
                     cardGameWinner.setText(gameStringWinner + " " + gameStringWin);
+                    totalGamesWonInt++;
+                    totalGamesInt++;
                 }else if (valueOne < valueTwo){
                     cardGameWinner.setText(gameStringWinner + " " + gameStringLose);
+                    totalGamesInt++;
+                }
+
+                totalWinPercentageDouble = (totalGamesWonInt / (double)totalGamesInt);
+
+                totalGames.setText(gameStringTotalGames + " " + totalGamesInt);
+                totalGamesWon.setText(gameStringTotalWins + " " + totalGamesWonInt);
+                totalWinPercent.setText(gameStringTotalPercent + " " + String.format("%.2f", totalWinPercentageDouble) + "%");
+
+                if(cardStringRemaining.equals("0")){
+                    Toast lowToast = Toast.makeText(MainActivity.this, "Shuffle Cards", Toast.LENGTH_LONG);
+                    lowToast.show();
+                    //todo: reset the value of cardStringReminaing to 52 cards and shuffle cards without the user having to do so manually
                 }
 
             }
