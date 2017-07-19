@@ -30,16 +30,6 @@ import okhttp3.Response;
 
 /*
 
-    todo: (1) Finish Logic for the card game
-     - User win vs lose
-    todo: (2) Add an Indeterminate Progress Bar
-     -Show when the async task starts
-     -Hide when the async task finishes
-     -It should be in the center of the screen
-    todo: (3) Add tracking for the Number of games played
-     -Show how many games in total have been played
-     -Show how many games the user won
-     -Show the users Win percentage
     todo: (4) Create a repo for the chuck norris jokes app
      -Push your code to that repo
      -Will probably need to research the steps
@@ -211,12 +201,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             indeterminateProgressBar.setVisibility(View.VISIBLE);
-        }
+            }
 
         @Override
         protected ArrayList <Card> doInBackground(Void... params) {
             OkHttpClient clientSecond = new OkHttpClient();
-            Log.d("secondRequest", updatedDrawCardsEndPoint);
+            //Log.d("secondRequest", updatedDrawCardsEndPoint);
             Request requestSecond = new Request.Builder().url(updatedDrawCardsEndPoint).build();
             String cardReturn = null;
 
@@ -264,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayList<Card> cardArray) {
-            if(cardArray != null){
+            if(cardArray != null) {
                 indeterminateProgressBar.setVisibility(View.INVISIBLE);
                 Log.d("post execute", String.valueOf(cardArray));
                 cardPicOne.setVisibility(View.VISIBLE);
@@ -272,14 +262,14 @@ public class MainActivity extends AppCompatActivity {
                 cardsRemaining.setText(cardStringRemaining + " " + cardStringEndRemaining);
                 cardsRemaining.setVisibility(View.VISIBLE);
 
-                for(int i = 0; i < cardArray.size(); i++) {
-                    if(i == 0) {
+                for (int i = 0; i < cardArray.size(); i++) {
+                    if (i == 0) {
                         cardNameOne.setText(cardArray.get(i).getValue() + " of " + cardArray.get(i).getSuit());
                         Glide.with(MainActivity.this).load(cardArray.get(i).getImage()).into(cardPicOne);
                         cardValueOne.setText(cardStringValueTag + " " + cardArray.get(i).getValue());
                         gameStringValueOne = cardArray.get(i).getValue();
                     }
-                    if(i == 1) {
+                    if (i == 1) {
                         cardNameTwo.setText(cardArray.get(i).getValue() + " of " + cardArray.get(i).getSuit());
                         Glide.with(MainActivity.this).load(cardArray.get(i).getImage()).into(cardPicTwo);
                         cardValueTwo.setText(cardStringValueTag + " " + cardArray.get(i).getValue());
@@ -294,31 +284,32 @@ public class MainActivity extends AppCompatActivity {
                 valueOne = cardValueCompare.getFirstStringValue(gameStringValueOne);
                 valueTwo = cardValueCompare.getSecondStringValue(gameStringValueTwo);
 
-                if(valueOne == valueTwo){
+                if (valueOne == valueTwo) {
                     cardGameWinner.setText(gameStringWinner + " " + gameStringTie);
                     totalGamesInt++;
-                }else if (valueOne > valueTwo){
+                } else if (valueOne > valueTwo) {
                     cardGameWinner.setText(gameStringWinner + " " + gameStringWin);
                     totalGamesWonInt++;
                     totalGamesInt++;
-                }else if (valueOne < valueTwo){
+                } else if (valueOne < valueTwo) {
                     cardGameWinner.setText(gameStringWinner + " " + gameStringLose);
                     totalGamesInt++;
                 }
 
-                totalWinPercentageDouble = (totalGamesWonInt / (double)totalGamesInt);
+                totalWinPercentageDouble = (totalGamesWonInt / (double) totalGamesInt);
 
                 totalGames.setText(gameStringTotalGames + " " + totalGamesInt);
                 totalGamesWon.setText(gameStringTotalWins + " " + totalGamesWonInt);
                 totalWinPercent.setText(gameStringTotalPercent + " " + String.format("%.2f", totalWinPercentageDouble) + "%");
 
-                if(cardStringRemaining.equals("0")){
+                if (cardStringRemaining.equals("0")) {
+                    drawCards.setClickable(false);
                     Toast lowToast = Toast.makeText(MainActivity.this, "Shuffle Cards", Toast.LENGTH_LONG);
                     lowToast.show();
-                    //todo: reset the value of cardStringReminaing to 52 cards and shuffle cards without the user having to do so manually
                 }
 
             }
+
         }
     }
 
@@ -333,9 +324,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         new ShuffleCardsTask().execute();
+        drawCards.setClickable(true);
+        cardsRemaining.setText("52" + " " + cardStringEndRemaining);
         String toaster = "Cards Shuffled";
         Toast toast = Toast.makeText(this, toaster, Toast.LENGTH_SHORT);
         toast.show();
+
         return super.onOptionsItemSelected(item);
     }
 }
