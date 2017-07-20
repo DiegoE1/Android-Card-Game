@@ -28,18 +28,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 
-/*
-
-    todo: (4) Create a repo for the chuck norris jokes app
-     -Push your code to that repo
-     -Will probably need to research the steps
-
- */
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String shuffleCardsEndPoint = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
-    private String drawCardsEndPoint = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=2";
+    private static final String drawCardsEndPoint = "https://deckofcardsapi.com/api/deck/<<deck_id>>/draw/?count=2";
     private String updatedDrawCardsEndPoint;
 
     private Button drawCards;
@@ -66,23 +58,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView cardPicTwo;
 
     private String deckId;
-    private String cardStringValueTag;
-    private String gameStringWhoWon;
-    private String gameStringWinner;
-
-    private String gameStringValueOne;
-    private String gameStringValueTwo;
-
-    private String gameStringWin;
-    private String gameStringLose;
-    private String gameStringTie;
-
-    private String gameStringTotalGames;
-    private String gameStringTotalWins;
-    private String gameStringTotalPercent;
 
     private String cardStringRemaining;
-    private String cardStringEndRemaining;
+    private String gameStringValueOne;
+    private String gameStringValueTwo;
 
     private ProgressBar indeterminateProgressBar;
 
@@ -120,20 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
         cardPicOne = (ImageView) findViewById(R.id.image_card_one);
         cardPicTwo = (ImageView) findViewById(R.id.image_card_two);
-
-        cardStringValueTag = getString(R.string.card_value_tag);
-        gameStringWhoWon = getString(R.string.game_who_won);
-        gameStringWinner = getString(R.string.game_winner);
-
-        gameStringWin = getString(R.string.game_user_won);
-        gameStringLose = getString(R.string.game_computer_won);
-        gameStringTie = getString(R.string.game_tie);
-
-        gameStringTotalGames = getString(R.string.total_games);
-        gameStringTotalWins = getString(R.string.total_games_won);
-        gameStringTotalPercent = getString(R.string.win_percent);
-
-        cardStringEndRemaining = getString(R.string.cards_remaining);
 
         indeterminateProgressBar = (ProgressBar) findViewById(R.id.indeterminateBar);
 
@@ -193,6 +158,15 @@ public class MainActivity extends AppCompatActivity {
                 updatedDrawCardsEndPoint = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=2";
                 Log.d("updatedDrawCardsEndPt", updatedDrawCardsEndPoint);
 
+                cardPicOne.setVisibility(View.INVISIBLE);
+                cardPicTwo.setVisibility(View.INVISIBLE);
+                cardNameOne.setVisibility(View.INVISIBLE);
+                cardNameTwo.setVisibility(View.INVISIBLE);
+                cardValueOne.setVisibility(View.INVISIBLE);
+                cardValueTwo.setVisibility(View.INVISIBLE);
+                cardGameWhoWon.setVisibility(View.INVISIBLE);
+                cardGameWinner.setVisibility(View.INVISIBLE);
+
             }
         }
     }
@@ -206,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected ArrayList <Card> doInBackground(Void... params) {
             OkHttpClient clientSecond = new OkHttpClient();
-            //Log.d("secondRequest", updatedDrawCardsEndPoint);
+            Log.d("secondRequest", updatedDrawCardsEndPoint);
             Request requestSecond = new Request.Builder().url(updatedDrawCardsEndPoint).build();
             String cardReturn = null;
 
@@ -259,60 +233,56 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("post execute", String.valueOf(cardArray));
                 cardPicOne.setVisibility(View.VISIBLE);
                 cardPicTwo.setVisibility(View.VISIBLE);
-                cardsRemaining.setText(cardStringRemaining + " " + cardStringEndRemaining);
+                cardsRemaining.setText(cardStringRemaining + " " + getString(R.string.cards_remaining));
                 cardsRemaining.setVisibility(View.VISIBLE);
 
                 for (int i = 0; i < cardArray.size(); i++) {
                     if (i == 0) {
                         cardNameOne.setText(cardArray.get(i).getValue() + " of " + cardArray.get(i).getSuit());
                         Glide.with(MainActivity.this).load(cardArray.get(i).getImage()).into(cardPicOne);
-                        cardValueOne.setText(cardStringValueTag + " " + cardArray.get(i).getValue());
+                        cardValueOne.setText(getString(R.string.card_value_tag) + " " + cardArray.get(i).getValue());
                         gameStringValueOne = cardArray.get(i).getValue();
                     }
                     if (i == 1) {
                         cardNameTwo.setText(cardArray.get(i).getValue() + " of " + cardArray.get(i).getSuit());
                         Glide.with(MainActivity.this).load(cardArray.get(i).getImage()).into(cardPicTwo);
-                        cardValueTwo.setText(cardStringValueTag + " " + cardArray.get(i).getValue());
+                        cardValueTwo.setText(getString(R.string.card_value_tag) + " " + cardArray.get(i).getValue());
                         gameStringValueTwo = cardArray.get(i).getValue();
                     }
-
                 }
-                cardGameWhoWon.setText(gameStringWhoWon);
-                cardGameWinner.setText(gameStringWinner);
+                cardGameWhoWon.setText(getString(R.string.game_who_won));
+                cardGameWinner.setText(getString(R.string.game_winner));
 
                 ValueCompare cardValueCompare = new ValueCompare(gameStringValueOne, gameStringValueTwo);
                 valueOne = cardValueCompare.getFirstStringValue(gameStringValueOne);
                 valueTwo = cardValueCompare.getSecondStringValue(gameStringValueTwo);
 
                 if (valueOne == valueTwo) {
-                    cardGameWinner.setText(gameStringWinner + " " + gameStringTie);
+                    cardGameWinner.setText(getString(R.string.game_winner) + " " + getString(R.string.game_tie));
                     totalGamesInt++;
                 } else if (valueOne > valueTwo) {
-                    cardGameWinner.setText(gameStringWinner + " " + gameStringWin);
+                    cardGameWinner.setText(getString(R.string.game_winner) + " " + getString(R.string.game_user_won));
                     totalGamesWonInt++;
                     totalGamesInt++;
                 } else if (valueOne < valueTwo) {
-                    cardGameWinner.setText(gameStringWinner + " " + gameStringLose);
+                    cardGameWinner.setText(getString(R.string.game_winner) + " " + getString(R.string.game_computer_won));
                     totalGamesInt++;
                 }
 
                 totalWinPercentageDouble = (totalGamesWonInt / (double) totalGamesInt);
 
-                totalGames.setText(gameStringTotalGames + " " + totalGamesInt);
-                totalGamesWon.setText(gameStringTotalWins + " " + totalGamesWonInt);
-                totalWinPercent.setText(gameStringTotalPercent + " " + String.format("%.2f", totalWinPercentageDouble) + "%");
+                totalGames.setText(getString(R.string.total_games) + " " + totalGamesInt);
+                totalGamesWon.setText(getString(R.string.total_games_won) + " " + totalGamesWonInt);
+                totalWinPercent.setText(getString(R.string.win_percent) + " " + String.format("%.2f", totalWinPercentageDouble) + "%");
 
                 if (cardStringRemaining.equals("0")) {
                     drawCards.setClickable(false);
                     Toast lowToast = Toast.makeText(MainActivity.this, "Shuffle Cards", Toast.LENGTH_LONG);
                     lowToast.show();
                 }
-
             }
-
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -325,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         new ShuffleCardsTask().execute();
         drawCards.setClickable(true);
-        cardsRemaining.setText("52" + " " + cardStringEndRemaining);
+        cardsRemaining.setText("52" + " " + getString(R.string.cards_remaining));
         String toaster = "Cards Shuffled";
         Toast toast = Toast.makeText(this, toaster, Toast.LENGTH_SHORT);
         toast.show();

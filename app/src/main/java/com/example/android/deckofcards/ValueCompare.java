@@ -5,17 +5,17 @@ package com.example.android.deckofcards;
  */
 
 public class ValueCompare {
-    String firstValue;
-    String secondValue;
+    private String firstValue;
+    private String secondValue;
 
     public ValueCompare(String mValue, String nValue) {
         firstValue = mValue;
         secondValue = nValue;
     }
 
-    int firstIntValue;
-    int secondIntValue;
-    int totalCards = 14;
+    private int firstIntValue;
+    private int secondIntValue;
+    private int totalCards = 14;
 
     public int getFirstStringValue(String firstValue) {
         for (int i = 0; i < totalCards; i++) {
