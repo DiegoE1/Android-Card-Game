@@ -65,9 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar indeterminateProgressBar;
 
-    private int valueOne;
-    private int valueTwo;
-
     private int totalGamesInt;
     private int totalGamesWonInt;
     private double totalWinPercentageDouble;
@@ -108,20 +105,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 new DrawTwoCardsTask().execute();
-                ///*
-                cardsRemaining.setVisibility(View.VISIBLE);
-                playerUser.setVisibility(View.VISIBLE);
-                playerComp.setVisibility(View.VISIBLE);
-                cardNameOne.setVisibility(View.VISIBLE);
-                cardNameTwo.setVisibility(View.VISIBLE);
-                cardValueOne.setVisibility(View.VISIBLE);
-                cardValueTwo.setVisibility(View.VISIBLE);
-                cardGameWhoWon.setVisibility(View.VISIBLE);
-                cardGameWinner.setVisibility(View.VISIBLE);
-                totalGames.setVisibility(View.VISIBLE);
-                totalGamesWon.setVisibility(View.VISIBLE);
-                totalWinPercent.setVisibility(View.VISIBLE);
-                //*/
+
+                buttonShowViews();
             }
         });
     }
@@ -158,15 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 updatedDrawCardsEndPoint = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=2";
                 Log.d("updatedDrawCardsEndPt", updatedDrawCardsEndPoint);
 
-                cardPicOne.setVisibility(View.INVISIBLE);
-                cardPicTwo.setVisibility(View.INVISIBLE);
-                cardNameOne.setVisibility(View.INVISIBLE);
-                cardNameTwo.setVisibility(View.INVISIBLE);
-                cardValueOne.setVisibility(View.INVISIBLE);
-                cardValueTwo.setVisibility(View.INVISIBLE);
-                cardGameWhoWon.setVisibility(View.INVISIBLE);
-                cardGameWinner.setVisibility(View.INVISIBLE);
-
+                shuffleDeckHideViews();
             }
         }
     }
@@ -253,18 +230,16 @@ public class MainActivity extends AppCompatActivity {
                 cardGameWhoWon.setText(getString(R.string.game_who_won));
                 cardGameWinner.setText(getString(R.string.game_winner));
 
-                ValueCompare cardValueCompare = new ValueCompare(gameStringValueOne, gameStringValueTwo);
-                valueOne = cardValueCompare.getFirstStringValue(gameStringValueOne);
-                valueTwo = cardValueCompare.getSecondStringValue(gameStringValueTwo);
+                GameLogic.GameStatus status = GameLogic.compareCards(gameStringValueOne, gameStringValueTwo);
 
-                if (valueOne == valueTwo) {
+                if (status == GameLogic.GameStatus.DRAW) {
                     cardGameWinner.setText(getString(R.string.game_winner) + " " + getString(R.string.game_tie));
                     totalGamesInt++;
-                } else if (valueOne > valueTwo) {
+                } else if (status == GameLogic.GameStatus.WINNER) {
                     cardGameWinner.setText(getString(R.string.game_winner) + " " + getString(R.string.game_user_won));
                     totalGamesWonInt++;
                     totalGamesInt++;
-                } else if (valueOne < valueTwo) {
+                } else{
                     cardGameWinner.setText(getString(R.string.game_winner) + " " + getString(R.string.game_computer_won));
                     totalGamesInt++;
                 }
@@ -301,5 +276,30 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void shuffleDeckHideViews (){
+        cardPicOne.setVisibility(View.INVISIBLE);
+        cardPicTwo.setVisibility(View.INVISIBLE);
+        cardNameOne.setVisibility(View.INVISIBLE);
+        cardNameTwo.setVisibility(View.INVISIBLE);
+        cardValueOne.setVisibility(View.INVISIBLE);
+        cardValueTwo.setVisibility(View.INVISIBLE);
+        cardGameWhoWon.setVisibility(View.INVISIBLE);
+        cardGameWinner.setVisibility(View.INVISIBLE);
+    }
+    public void buttonShowViews(){
+        cardsRemaining.setVisibility(View.VISIBLE);
+        playerUser.setVisibility(View.VISIBLE);
+        playerComp.setVisibility(View.VISIBLE);
+        cardNameOne.setVisibility(View.VISIBLE);
+        cardNameTwo.setVisibility(View.VISIBLE);
+        cardValueOne.setVisibility(View.VISIBLE);
+        cardValueTwo.setVisibility(View.VISIBLE);
+        cardGameWhoWon.setVisibility(View.VISIBLE);
+        cardGameWinner.setVisibility(View.VISIBLE);
+        totalGames.setVisibility(View.VISIBLE);
+        totalGamesWon.setVisibility(View.VISIBLE);
+        totalWinPercent.setVisibility(View.VISIBLE);
     }
 }
