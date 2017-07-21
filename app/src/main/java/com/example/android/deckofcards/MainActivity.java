@@ -288,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
         cardGameWhoWon.setVisibility(View.INVISIBLE);
         cardGameWinner.setVisibility(View.INVISIBLE);
     }
+
     public void buttonShowViews(){
         cardsRemaining.setVisibility(View.VISIBLE);
         playerUser.setVisibility(View.VISIBLE);
