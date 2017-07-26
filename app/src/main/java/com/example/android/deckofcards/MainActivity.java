@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             indeterminateProgressBar.setVisibility(View.VISIBLE);
+            drawCards.setVisibility(View.INVISIBLE);
             }
 
         @Override
@@ -207,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(ArrayList<Card> cardArray) {
             if(cardArray != null) {
                 indeterminateProgressBar.setVisibility(View.INVISIBLE);
+                drawCards.setVisibility(View.VISIBLE);
                 Log.d("post execute", String.valueOf(cardArray));
                 cardPicOne.setVisibility(View.VISIBLE);
                 cardPicTwo.setVisibility(View.VISIBLE);
@@ -252,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (cardStringRemaining.equals("0")) {
                     drawCards.setClickable(false);
+                    drawCards.setVisibility(View.INVISIBLE);
                     Toast lowToast = Toast.makeText(MainActivity.this, "Shuffle Cards", Toast.LENGTH_LONG);
                     lowToast.show();
                 }
@@ -270,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         new ShuffleCardsTask().execute();
         drawCards.setClickable(true);
+        drawCards.setVisibility(View.VISIBLE);
         cardsRemaining.setText("52" + " " + getString(R.string.cards_remaining));
         String toaster = "Cards Shuffled";
         Toast toast = Toast.makeText(this, toaster, Toast.LENGTH_SHORT);
